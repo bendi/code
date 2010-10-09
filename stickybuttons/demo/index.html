@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<title>jquery.stickyButtons presentation</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script src="../src/jquery.stickyButtons.js" type="text/javascript"></script>
+<style type="text/css">
+body {
+	background: #ccc;
+}
+#imgs {
+	border: 1px solid #000;
+	background: #fff;
+	width: 210px;
+	height: 300px;
+	overflow: auto;
+	padding: 5px;
+	position: relative;
+}
+#imgs div {
+	height: 95px;
+	width: 95px;
+	margin: 2px;
+	float: left;
+	position: absolute;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-top: 1px solid #aaa;
+	border-left: 1px solid #aaa;
+	border-bottom: 1px solid #666;
+	border-right: 1px solid #666;
+	-moz-box-shadow: 4px 4px 3px #999;
+	-webkit-box-shadow: 4px 4px 3px #999;
+	box-shadow: 4px 4px 3px #999;
+}
+</style>
+</head>
+<body>
+<p>See more on <a href="http://dominika.osadcow.pl/galeria/partynice/">www.dominika.osadcow.pl/galeria/partynice/</a></p>
+<div id="imgs">
+	<div id="img_0" style="background-image: url(http://dominika.osadcow.pl/i/galeria/partynice/ikony/001_new.jpg);"><a href="#iimg_0"></a></div>
+	<div id="img_1" style="background-image: url(http://dominika.osadcow.pl/i/galeria/partynice/ikony/002_new.jpg);"><a href="#iimg_1"></a></div>
+	<div id="img_2" style="background-image: url(http://dominika.osadcow.pl/i/galeria/partynice/ikony/003_new.jpg);"><a href="#iimg_2"></a></div>
+	<div id="img_3" style="background-image: url(http://dominika.osadcow.pl/i/galeria/partynice/ikony/004_new.jpg);"><a href="#iimg_3"></a></div>
+</div>
+<script type="text/javascript">
+(function(){
+	var WIDTH=HEIGHT=100, MARGINS=4;
+	var rowNum = 0;
+	$.each($("#imgs div"), function(i,v) {
+		var x = (i%2) * (WIDTH + MARGINS);
+		// increase y coordinate when row changes
+		if (i&&!(i%2))++rowNum;
+		$(v).css('left', x).css('top', rowNum * (HEIGHT + MARGINS))
+			// make sure to apply sticky behaviour when your position is set
+			.stickyButton();
+	});
+})()
+</script>
+</body>
+</html>
