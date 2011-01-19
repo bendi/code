@@ -81,9 +81,9 @@
 	function onMove(tPos, e, ratio, start) {
 		var o=this, mouse = p(e).sub(p(o.offset())).add(start);
 		var delta = mouse.sub(start).add(o.width()*2, o.height()*2).mul(ratio,ratio);
-				var cur = getPos(curPos(o), tPos, mouse.sub(delta));
+		var cur = getPos(curPos(o), tPos, mouse.sub(delta));
 		setPos(o, cur[0]);
-				return cur[1];
+		return cur[1];
 	}
 	function getSteps(target, cur, tPos, S) {
 		if (Math.abs(target.x-cur.x) < .1 && Math.abs(target.y-cur.y) < .1)return[target, cur];
