@@ -1,0 +1,8 @@
+Zend framework decorator for enabling pure client-side validation.
+
+This class WILL:
+- add client side validators for each server-side validator
+- add onsubmit handler to form in order to perform client-side validation
+
+This class WILL NOT:
+- require external JS libraries
