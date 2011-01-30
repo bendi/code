@@ -1,5 +1,6 @@
 <?php
 
+
 class ElementValidators {
 
 	private $list = array();
@@ -8,7 +9,6 @@ class ElementValidators {
 
 	/**
 	 *
-	 * Enter description here ...
 	 * @param string $elementName
 	 * @param string $varName
 	 */
@@ -44,6 +44,22 @@ class ElementValidators {
 	}
 
 	/**
+	 * Shortcut for has method - if name starts with "has"
+	 *
+	 * @param string $name
+	 * @param array $arguments
+	 * @throws Exception
+	 */
+	public function __call($name, $arguments) {
+		if (substr($name, 0, 3) == "has") {
+			return $this->has("Zend_Validate_" . substr($name, 3));
+		}
+		if (!method_exists($this, $name)) {
+			throw new Exception("Method $name was not found in object: " . get_class($this));
+		}
+		return call_user_func_array(array($this, $name), $arguments);
+	}
+	/**
 	 *
 	 */
 	public function __toString() {
@@ -78,8 +94,8 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	}
 
 	/**
-	 *
-	 * @param string $content
+	 * (non-PHPdoc)
+	 * @see Zend_Form_Decorator_Abstract::render()
 	 */
 	public function render($content) {
 		$form = $this->getElement();
@@ -104,7 +120,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 			foreach($element->getValidators() as $validator) {
 				$jsValidator->add($this->getValidator($validator, $label));
 			}
-			if (!$jsValidator->has('Zend_Validate_NotEmpty') && $element->isRequired()) {
+			if (!$jsValidator->hasNotEmpty() && $element->isRequired()) {
 				$jsValidator->add($this->getValidator($req, $label));
 			}
 			array_push($jsValidators, $jsValidator);
@@ -114,6 +130,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	}
 
 	/**
+	 *
 	 * @param array $jsValidators
 	 */
 	protected function buildSubmitHandler(array $jsValidators) {
@@ -147,13 +164,18 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	const ORDER_ALNUM 			= 40;
 	const ORDER_REGEX 			= 50;
 
-	protected function getValidator($v, $label) {
-		$msgs = $this->getMessages($v);
-		$name = get_class($v);
+	/**
+	 *
+	 * @param Zend_Validate_Interface $validator
+	 * @param string $label
+	 */
+	protected function getValidator(Zend_Validate_Interface $validator, $label) {
+		$msgs = $this->getMessages($validator);
+		$name = get_class($validator);
 		switch($name) {
 			case 'Zend_Validate_StringLength':
-				$min = $v->getMin();
-				$max = $v->getMax();
+				$min = $validator->getMin();
+				$max = $validator->getMax();
 				$jsValidation = array(
 					'!this.value || this.value.length < ' . $min => $msgs[Zend_Validate_StringLength::TOO_SHORT]
 				);
@@ -169,7 +191,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 				));
 				break;
 			case 'Zend_Validate_Regex':
-				$pattern = $v->getPattern();
+				$pattern = $validator->getPattern();
 				$fn = $this->buildFunction(self::ORDER_REGEX, $label, array(
 					'!this.value || !'.$pattern.'.test(this.value)' => $msgs[Zend_Validate_Regex::NOT_MATCH]
 				));
@@ -192,7 +214,13 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 		return array($name, $fn);
 	}
 
-	protected function buildFunction($ord, $label, $conds) {
+	/**
+	 *
+	 * @param int $ord
+	 * @param string $label
+	 * @param array $conds
+	 */
+	protected function buildFunction($ord, $label, array $conds) {
 		$s = 'function(){';
 		foreach($conds as $cond => $msg) {
 			$s .= 'if(' . $cond . '){alert("' . $label . ' - ' . $msg . '".replace("%value%", this.value));} else ';
@@ -201,6 +229,10 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 		return '{ord:'.$ord.', fn:'.$s.'}';
 	}
 
+	/**
+	 *
+	 * @param Zend_Validate_Interface $validator
+	 */
 	private function getMessages(Zend_Validate_Interface $validator) {
 		$translator = $validator->getTranslator();
 		$messageTemplates = $validator->getMessageTemplates();
