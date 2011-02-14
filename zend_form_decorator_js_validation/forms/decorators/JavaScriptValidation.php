@@ -5,16 +5,13 @@ class ElementValidators {
 
 	private $list = array();
 	private $elementName;
-	private $varName;
 
 	/**
 	 *
 	 * @param string $elementName
-	 * @param string $varName
 	 */
-	public function __construct($elementName, $varName) {
+	public function __construct($elementName) {
 		$this->elementName = $elementName;
-		$this->varName = $varName;
 	}
 
 	/**
@@ -26,12 +23,12 @@ class ElementValidators {
 	public function add($name, $fn = null) {
 		if (func_num_args() == 1) {
 			if (is_array($name)) {
-				list($name, $fn) = $name;
+				list($name, $ord, $fn) = $name;
 			} else {
 				throw new Exception("Wrong parameters for add function");
 			}
 		}
-		$this->list[$name] = $fn;
+		$this->list[$ord] = $fn;
 	}
 
 	/**
@@ -63,12 +60,8 @@ class ElementValidators {
 	 *
 	 */
 	public function __toString() {
-		$validators = $this->varName;
-		$s = $validators . '.' . $this->elementName .' = []' . "\n";
-		foreach($this->list as $fn) {
-			$s .= $validators . '.' . $this->elementName .'.push(' . $fn . ');' . "\n";
-		}
-		return $s;
+		ksort($this->list);
+		return $this->elementName .": [ \n". implode(",\n", $this->list) . "\n]";
 	}
 };
 
@@ -110,13 +103,54 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 			$form->setName($formName);
 		}
 
+		$js = <<<JS
+Zend_Form_Validate = {
+	validateSingle: function(v, el) {
+		for(var i = 0; i < v.length; i++) {
+			try {
+				if (!v[i].call(el)) {
+					return false;
+				}
+			} catch(e) {
+				// client made a boo boo - send the form
+			}
+		}
+		return true;
+	},
+	run: function(v) {
+		var ret = true;
+		for(var name in v) {
+			if (v[name].length && !Zend_Form_Validate.validateSingle(v[name], this[name])) {
+				ret = false;
+			}
+		}
+		return ret;
+	},
+	reportError: function(label, msg, el) {
+		var p = el.parentNode,
+			uls = p.getElementsByTagName('ul');
+		if (uls.length) {
+			p.removeChild(uls[0]);
+		}
+		var ul = document.createElement('ul');
+		ul.className = 'errors';
+		var li = document.createElement('li');
+		li.innerHTML = msg.replace("%value%", el.value);
+		ul.appendChild(li);
+		p.insertBefore(ul, el.nextSibling);
+	}
+}
+JS;
+
+		$view->headScript()->appendScript($js, 'text/javascript');
+
 		$req = new Zend_Validate_NotEmpty();
 		$jsValidators = array();
 		foreach($form->getElements() as $element) {
 			$name = $element->getName();
 			$label = $element->getLabel();
 
-			$jsValidator = new ElementValidators($name, $this->getVarName());
+			$jsValidator = new ElementValidators($name);
 			foreach($element->getValidators() as $validator) {
 				$jsValidator->add($this->getValidator($validator, $label));
 			}
@@ -135,27 +169,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	 */
 	protected function buildSubmitHandler(array $jsValidators) {
 		$validators = $this->getVarName();
-		$s = 'var '.$validators.' = {};' . "\n";
-		foreach($jsValidators as $jsValidator) {
-			$s .= $jsValidator;
-		}
-		return 'function(e) {
-			'.$s."\n".'
-			for(var name in '.$validators.') {
-				if (!'.$validators.'[name].length) continue; // skip empty ones
-				'.$validators.'[name].sort(function(a,b){return a.ord - b.ord;});
-				for(var i = 0; i < '.$validators.'[name].length; i++) {
-					try {
-						if (!'.$validators.'[name][i].fn.call(this[name])) {
-							return false;
-						}
-					} catch(e) {
-						// client made a boo boo - send the form
-					}
-				}
-			}
-			return true;
-		};';
+		return 'function(e){return Zend_Form_Validate.run.call(this, {'.implode(",\n", $jsValidators).'});}';
 	}
 
 	const ORDER_REQUIRED 		= 10;
@@ -199,7 +213,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 			case 'Zend_Validate_Digits':
 				$fn = $this->buildFunction(self::ORDER_DIGITS, $label, array(
 					'!this.value' => $msgs[Zend_Validate_Digits::STRING_EMPTY],
-					'/^\d+/.test(this.value)' => $msgs[Zend_Validate_Digits::NOT_DIGITS],
+					'!/^\d+/.test(this.value)' => $msgs[Zend_Validate_Digits::NOT_DIGITS],
 				));
 				break;
 			case 'Zend_Validate_NotEmpty':
@@ -211,7 +225,8 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 				$fn = 'function(){return!0;}';
 				break;
 		}
-		return array($name, $fn);
+		array_unshift($fn, $name);
+		return $fn;
 	}
 
 	/**
@@ -223,10 +238,10 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	protected function buildFunction($ord, $label, array $conds) {
 		$s = 'function(){';
 		foreach($conds as $cond => $msg) {
-			$s .= 'if(' . $cond . '){alert("' . $label . ' - ' . $msg . '".replace("%value%", this.value));} else ';
+			$s .= 'if(' . $cond . '){Zend_Form_Validate.reportError("' . $label . '", "' . $msg . '", this);} else ';
 		}
 		$s .= '{return!0;}}';
-		return '{ord:'.$ord.', fn:'.$s.'}';
+		return array($ord, $s);
 	}
 
 	/**
