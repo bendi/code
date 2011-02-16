@@ -245,12 +245,11 @@ JS;
 	 * @param array $conditions
 	 */
 	protected function buildFunction($label, array $conditions) {
-		$s = 'function(){';
+		$conds = array();
 		foreach($conditions as $condition => $msg) {
-			$s .= 'if(' . $condition . '){Zend_Form_Validate.reportError("' . $label . '", "' . $msg . '", this);} else ';
+			$conds[] = sprintf('case %s: return Zend_Form_Validate.reportError("%s", "%s", this);', $condition, $label, $msg);
 		}
-		$s .= '{return!0;}}';
-		return $s;
+		return sprintf('function(){switch(true){%s} return!0}', implode("\n", $conds));
 	}
 
 	/**
