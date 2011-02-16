@@ -147,10 +147,10 @@ JS;
 		$req = new Zend_Validate_NotEmpty();
 		$jsValidators = array();
 		foreach($form->getElements() as $element) {
-			$name = $element->getName();
+			$elementName = $element->getName();
 			$label = $element->getLabel();
 
-			$jsValidator = new ElementValidators($name);
+			$jsValidator = new ElementValidators($elementName);
 			foreach($element->getValidators() as $validator) {
 				$jsValidator->add($this->getValidator($validator, $label));
 			}
@@ -160,16 +160,21 @@ JS;
 			array_push($jsValidators, $jsValidator);
 		}
 
-		return $content . '<script type="text/javascript">document.forms.'.$formName.'.onsubmit='.$this->buildSubmitHandler($jsValidators).'</script>';
+
+		return $content . $this->buildSubmitHandler($formName, $jsValidators);
 	}
 
+	const SCRIPT_TPL = '<script type="text/javascript">document.forms.%s.onsubmit=%s</script>';
+
 	/**
-	 *
+	 * @param string $formName
 	 * @param array $jsValidators
 	 */
-	protected function buildSubmitHandler(array $jsValidators) {
-		$validators = $this->getVarName();
-		return 'function(e){return Zend_Form_Validate.run.call(this, {'.implode(",\n", $jsValidators).'});}';
+	protected function buildSubmitHandler($formName, array $jsValidators) {
+		return sprintf(self::SCRIPT_TPL,
+			$formName,
+			'function(e){return Zend_Form_Validate.run.call(this, {'.implode(",\n", $jsValidators).'});}'
+		);
 	}
 
 	const ORDER_REQUIRED 		= 10;
@@ -196,52 +201,56 @@ JS;
 				if ($max != null) {
 					$jsValidation['this.value.length > ' . $max] = $msgs[Zend_Validate_StringLength::TOO_LONG];
 				}
-				$fn = $this->buildFunction(self::ORDER_STRING_LENGTH, $label, $jsValidation);
+				$ord = self::ORDER_STRING_LENGTH;
+				$fn = $this->buildFunction($label, $jsValidation);
 				break;
 			case 'Zend_Validate_Alnum':
-				$fn = $this->buildFunction(self::ORDER_ALNUM, $label, array(
+				$ord = self::ORDER_ALNUM;
+				$fn = $this->buildFunction($label, array(
 					'!this.value' => $msgs[Zend_Validate_Alnum::STRING_EMPTY],
 					'!/^\w+$/.test(this.value)' => $msgs[Zend_Validate_Alnum::NOT_ALNUM]
 				));
 				break;
 			case 'Zend_Validate_Regex':
 				$pattern = $validator->getPattern();
-				$fn = $this->buildFunction(self::ORDER_REGEX, $label, array(
+				$ord = self::ORDER_REGEX;
+				$fn = $this->buildFunction($label, array(
 					'!this.value || !'.$pattern.'.test(this.value)' => $msgs[Zend_Validate_Regex::NOT_MATCH]
 				));
 				break;
 			case 'Zend_Validate_Digits':
-				$fn = $this->buildFunction(self::ORDER_DIGITS, $label, array(
+				$ord = self::ORDER_DIGITS;
+				$fn = $this->buildFunction($label, array(
 					'!this.value' => $msgs[Zend_Validate_Digits::STRING_EMPTY],
 					'!/^\d+/.test(this.value)' => $msgs[Zend_Validate_Digits::NOT_DIGITS],
 				));
 				break;
 			case 'Zend_Validate_NotEmpty':
-				$fn = $this->buildFunction(self::ORDER_REQUIRED, $label, array(
+				$ord = self::ORDER_REQUIRED;
+				$fn = $this->buildFunction($label, array(
 					'!this.value' => $msgs[Zend_Validate_NotEmpty::IS_EMPTY]
 				));
 				break;
 			default:
 				$fn = 'function(){return!0;}';
+				$ord = 0;
 				break;
 		}
-		array_unshift($fn, $name);
-		return $fn;
+		return array($name, $ord, $fn);
 	}
 
 	/**
 	 *
-	 * @param int $ord
 	 * @param string $label
-	 * @param array $conds
+	 * @param array $conditions
 	 */
-	protected function buildFunction($ord, $label, array $conds) {
+	protected function buildFunction($label, array $conditions) {
 		$s = 'function(){';
-		foreach($conds as $cond => $msg) {
-			$s .= 'if(' . $cond . '){Zend_Form_Validate.reportError("' . $label . '", "' . $msg . '", this);} else ';
+		foreach($conditions as $condition => $msg) {
+			$s .= 'if(' . $condition . '){Zend_Form_Validate.reportError("' . $label . '", "' . $msg . '", this);} else ';
 		}
 		$s .= '{return!0;}}';
-		return array($ord, $s);
+		return $s;
 	}
 
 	/**
@@ -258,7 +267,7 @@ JS;
 				$message = $translator->translate($message);
 			}
 			foreach ($messageVariables as $property) {
-				$message = str_replace("%$property%", (string) call_user_method('get'.ucfirst($property), $validator), $message);
+				$message = str_replace("%$property%", call_user_func(array($validator, 'get'.ucfirst($property))), $message);
 			}
 			$messages[$messageKey] = $message;
 		}
