@@ -127,17 +127,21 @@ Zend_Form_Validate = {
 		return ret;
 	},
 	reportError: function(label, msg, el) {
-		var p = el.parentNode,
-			uls = p.getElementsByTagName('ul');
-		if (uls.length) {
-			p.removeChild(uls[0]);
-		}
+		var p = el.parentNode;
+		Zend_Form_Validate.clearError(p);
 		var ul = document.createElement('ul');
 		ul.className = 'errors';
 		var li = document.createElement('li');
 		li.innerHTML = msg.replace("%value%", el.value);
 		ul.appendChild(li);
 		p.insertBefore(ul, el.nextSibling);
+	},
+	clearError: function(p) {
+		var uls = p.getElementsByTagName('ul');
+		if (uls.length) {
+			p.removeChild(uls[0]);
+		}
+		return!0;
 	}
 }
 JS;
@@ -249,7 +253,8 @@ JS;
 		foreach($conditions as $condition => $msg) {
 			$conds[] = sprintf('case %s: return Zend_Form_Validate.reportError("%s", "%s", this);', $condition, $label, $msg);
 		}
-		return sprintf('function(){switch(true){%s} return!0}', implode("\n", $conds));
+		$conds[] = 'default: return Zend_Form_Validate.clearError(this.parentNode);';
+		return sprintf('function(){switch(true){%s}}', implode("\n", $conds));
 	}
 
 	/**
