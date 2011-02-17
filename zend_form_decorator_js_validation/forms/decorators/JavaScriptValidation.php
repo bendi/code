@@ -104,7 +104,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 		}
 
 		$js = <<<JS
-Zend_Form_Validate = {
+Zend_Form_Validator = {
 	validateSingle: function(v, el) {
 		for(var i = 0; i < v.length; i++) {
 			try {
@@ -120,7 +120,7 @@ Zend_Form_Validate = {
 	run: function(v) {
 		var ret = true;
 		for(var name in v) {
-			if (v[name].length && !Zend_Form_Validate.validateSingle(v[name], this[name])) {
+			if (v[name].length && !Zend_Form_Validator.validateSingle(v[name], this[name])) {
 				ret = false;
 			}
 		}
@@ -128,7 +128,7 @@ Zend_Form_Validate = {
 	},
 	reportError: function(label, msg, el) {
 		var p = el.parentNode;
-		Zend_Form_Validate.clearError(p);
+		Zend_Form_Validator.clearError(p);
 		var ul = document.createElement('ul');
 		ul.className = 'errors';
 		var li = document.createElement('li');
@@ -165,21 +165,10 @@ JS;
 		}
 
 
-		return $content . $this->buildSubmitHandler($formName, $jsValidators);
+		return $content . sprintf(self::SCRIPT_TPL, $formName, implode(",\n", $jsValidators));
 	}
 
-	const SCRIPT_TPL = '<script type="text/javascript">document.forms.%s.onsubmit=%s</script>';
-
-	/**
-	 * @param string $formName
-	 * @param array $jsValidators
-	 */
-	protected function buildSubmitHandler($formName, array $jsValidators) {
-		return sprintf(self::SCRIPT_TPL,
-			$formName,
-			'function(e){return Zend_Form_Validate.run.call(this, {'.implode(",\n", $jsValidators).'});}'
-		);
-	}
+	const SCRIPT_TPL = '<script type="text/javascript">document.forms.%s.onsubmit=function(e){return Zend_Form_Validator.run.call(this, {%s});}</script>';
 
 	const ORDER_REQUIRED 		= 10;
 	const ORDER_STRING_LENGTH 	= 20;
@@ -251,9 +240,9 @@ JS;
 	protected function buildFunction($label, array $conditions) {
 		$conds = array();
 		foreach($conditions as $condition => $msg) {
-			$conds[] = sprintf('case %s: return Zend_Form_Validate.reportError("%s", "%s", this);', $condition, $label, $msg);
+			$conds[] = sprintf('case %s: return Zend_Form_Validator.reportError("%s", "%s", this);', $condition, $label, $msg);
 		}
-		$conds[] = 'default: return Zend_Form_Validate.clearError(this.parentNode);';
+		$conds[] = 'default: return Zend_Form_Validator.clearError(this.parentNode);';
 		return sprintf('function(){switch(true){%s}}', implode("\n", $conds));
 	}
 
