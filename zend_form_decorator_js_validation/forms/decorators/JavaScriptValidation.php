@@ -68,8 +68,10 @@ class ElementValidators {
 class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstract {
 
 	private static $instances = 0;
+	private static $printValidatorJs = false;
 
 	private $_varName = 'validators';
+	private $_validateAll = false;
 
 	/**
 	 *
@@ -84,6 +86,14 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	 */
 	public function getVarName() {
 		return $this->_varName;
+	}
+
+	public function setValidateAll($validateAll) {
+		$this->_validateAll = $validateAll;
+	}
+
+	public function getValidateAll() {
+		return $this->_validateAll;
 	}
 
 	/**
@@ -104,49 +114,95 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 		}
 
 		$js = <<<JS
-Zend_Form_Validator = {
-	validateSingle: function(v, el) {
-		for(var i = 0; i < v.length; i++) {
-			try {
-				if (!v[i].call(el)) {
-					return false;
-				}
-			} catch(e) {
-				// client made a boo boo - send the form
+(function(){
+var MAX_RETRIES = 10;
+Zend = this.Zend || {};
+Zend.Form = Zend.Form || {};
+Zend.Form.Validator = function(form, rules, validateAll) {
+	this.errors = [];
+	this.validateAll = validateAll;
+	var that = this, retries = 0, init = function(f) {
+		if (typeof(form) === 'string') {
+			f = document.forms[form];
+		}
+		if (f) {
+			that.form = f;
+			if (document.all && !window.opera) {
+				f.attachEvent('onsubmit', function(){event.returnValue = that.validate(rules);});
+			} else {
+				f.addEventListener('submit', function(e) {if (!that.validate(rules)){ e.preventDefault(); }}, false);
 			}
+		} else if (retries++ < MAX_RETRIES) {
+			setTimeout(init, 100);
 		}
-		return true;
-	},
-	run: function(v) {
-		var ret = true;
-		for(var name in v) {
-			if (v[name].length && !Zend_Form_Validator.validateSingle(v[name], this[name])) {
-				ret = false;
-			}
-		}
-		return ret;
-	},
-	reportError: function(label, msg, el) {
-		var p = el.parentNode;
-		Zend_Form_Validator.clearError(p);
-		var ul = document.createElement('ul');
-		ul.className = 'errors';
-		var li = document.createElement('li');
-		li.innerHTML = msg.replace("%value%", el.value);
-		ul.appendChild(li);
-		p.insertBefore(ul, el.nextSibling);
-	},
-	clearError: function(p) {
-		var uls = p.getElementsByTagName('ul');
-		if (uls.length) {
-			p.removeChild(uls[0]);
-		}
-		return!0;
 	}
+	init();
+};
+
+Zend.Form.Validator.prototype.validateSingle = function(v, el) {
+	var ret = true;
+	for(var i = 0; i < v.length; i++) {
+		try {
+			if (!v[i].call(this, el)) {
+				ret = false;
+				if (!this.validateAll) {
+					break;
+				}
+			}
+		} catch(e) {
+			// client made a boo boo - send the form
+		}
+	}
+	return ret;
+};
+
+Zend.Form.Validator.prototype.validate = function(v) {
+	var ret = true;
+	for(var name in v) {
+		this.errors = [];
+		var el = this.form.elements[name];
+		if (v[name].length && !this.validateSingle(v[name], el)) {
+			ret = false;
+		}
+		Zend.Form.ErrorReporter.clearErrors(el);
+		if (this.errors.length) {
+			Zend.Form.ErrorReporter.reportErrors(el, this.errors);
+		}
+	}
+	return ret;
+};
+
+Zend.Form.Validator.prototype.addError = function(msg) {
+	this.errors.push(msg);
+};
+
+if (!Zend.Form.ErrorReporter) {
+	Zend.Form.ErrorReporter = {
+		reportErrors: function(el, errors) {
+			var p = el.parentNode, ul = document.createElement('ul');
+			ul.className = 'errors';
+			for(var i=0; i<errors.length; i++) {
+				var li = document.createElement('li');
+				li.innerHTML = errors[i].replace("%value%", el.value);
+				ul.appendChild(li);
+			}
+			p.insertBefore(ul, el.nextSibling);
+		},
+		clearErrors: function(el) {
+			var p = el.parentNode, uls = p.getElementsByTagName('ul');
+			if (uls.length) {
+				p.removeChild(uls[0]);
+			}
+		}
+	};
 }
+})()
 JS;
 
-		$view->headScript()->appendScript($js, 'text/javascript');
+		if (!self::$printValidatorJs) {
+			$view->headScript()->appendScript($js, 'text/javascript');
+			self::$printValidatorJs = true;
+		}
 
 		$req = new Zend_Validate_NotEmpty();
 		$jsValidators = array();
@@ -164,11 +220,14 @@ JS;
 			array_push($jsValidators, $jsValidator);
 		}
 
+		$validator = sprintf(self::SCRIPT_TPL, $formName, implode(",\n", $jsValidators), $this->getValidateAll());
 
-		return $content . sprintf(self::SCRIPT_TPL, $formName, implode(",\n", $jsValidators));
+		$view->headScript()->appendScript($validator . "\n");
+
+		return $content;
 	}
 
-	const SCRIPT_TPL = '<script type="text/javascript">document.forms.%s.onsubmit=function(e){return Zend_Form_Validator.run.call(this, {%s});}</script>';
+	const SCRIPT_TPL = 'new Zend.Form.Validator("%s", {%s}, %d);';
 
 	const ORDER_REQUIRED 		= 10;
 	const ORDER_STRING_LENGTH 	= 20;
@@ -179,9 +238,8 @@ JS;
 	/**
 	 *
 	 * @param Zend_Validate_Interface $validator
-	 * @param string $label
 	 */
-	protected function getValidator(Zend_Validate_Interface $validator, $label) {
+	protected function getValidator(Zend_Validate_Interface $validator) {
 		$msgs = $this->getMessages($validator);
 		$name = get_class($validator);
 		switch($name) {
@@ -189,39 +247,39 @@ JS;
 				$min = $validator->getMin();
 				$max = $validator->getMax();
 				$jsValidation = array(
-					'!this.value || this.value.length < ' . $min => $msgs[Zend_Validate_StringLength::TOO_SHORT]
+					'!el.value || el.value.length < ' . $min => $msgs[Zend_Validate_StringLength::TOO_SHORT]
 				);
 				if ($max != null) {
-					$jsValidation['this.value.length > ' . $max] = $msgs[Zend_Validate_StringLength::TOO_LONG];
+					$jsValidation['el.value.length > ' . $max] = $msgs[Zend_Validate_StringLength::TOO_LONG];
 				}
 				$ord = self::ORDER_STRING_LENGTH;
-				$fn = $this->buildFunction($label, $jsValidation);
+				$fn = $this->buildFunction($jsValidation);
 				break;
 			case 'Zend_Validate_Alnum':
 				$ord = self::ORDER_ALNUM;
-				$fn = $this->buildFunction($label, array(
-					'!this.value' => $msgs[Zend_Validate_Alnum::STRING_EMPTY],
-					'!/^\w+$/.test(this.value)' => $msgs[Zend_Validate_Alnum::NOT_ALNUM]
+				$fn = $this->buildFunction(array(
+					'!el.value' => $msgs[Zend_Validate_Alnum::STRING_EMPTY],
+					'!/^\w+$/.test(el.value)' => $msgs[Zend_Validate_Alnum::NOT_ALNUM]
 				));
 				break;
 			case 'Zend_Validate_Regex':
 				$pattern = $validator->getPattern();
 				$ord = self::ORDER_REGEX;
-				$fn = $this->buildFunction($label, array(
-					'!this.value || !'.$pattern.'.test(this.value)' => $msgs[Zend_Validate_Regex::NOT_MATCH]
+				$fn = $this->buildFunction(array(
+					'!el.value || !'.$pattern.'.test(el.value)' => $msgs[Zend_Validate_Regex::NOT_MATCH]
 				));
 				break;
 			case 'Zend_Validate_Digits':
 				$ord = self::ORDER_DIGITS;
-				$fn = $this->buildFunction($label, array(
-					'!this.value' => $msgs[Zend_Validate_Digits::STRING_EMPTY],
-					'!/^\d+/.test(this.value)' => $msgs[Zend_Validate_Digits::NOT_DIGITS],
+				$fn = $this->buildFunction(array(
+					'!el.value' => $msgs[Zend_Validate_Digits::STRING_EMPTY],
+					'!/^\d+/.test(el.value)' => $msgs[Zend_Validate_Digits::NOT_DIGITS],
 				));
 				break;
 			case 'Zend_Validate_NotEmpty':
 				$ord = self::ORDER_REQUIRED;
-				$fn = $this->buildFunction($label, array(
-					'!this.value' => $msgs[Zend_Validate_NotEmpty::IS_EMPTY]
+				$fn = $this->buildFunction(array(
+					'!el.value' => $msgs[Zend_Validate_NotEmpty::IS_EMPTY]
 				));
 				break;
 			default:
@@ -234,16 +292,15 @@ JS;
 
 	/**
 	 *
-	 * @param string $label
 	 * @param array $conditions
 	 */
-	protected function buildFunction($label, array $conditions) {
+	protected function buildFunction(array $conditions) {
 		$conds = array();
 		foreach($conditions as $condition => $msg) {
-			$conds[] = sprintf('case %s: return Zend_Form_Validator.reportError("%s", "%s", this);', $condition, $label, $msg);
+			$conds[] = sprintf('case %s: return this.addError("%s");', $condition, $msg);
 		}
-		$conds[] = 'default: return Zend_Form_Validator.clearError(this.parentNode);';
-		return sprintf('function(){switch(true){%s}}', implode("\n", $conds));
+		$conds[] = 'default: return!0;';
+		return sprintf('function(el){switch(true){%s}}', implode("\n", $conds));
 	}
 
 	/**
@@ -274,6 +331,9 @@ JS;
 	public function setOptions(array $array) {
 		if (!empty($array['varName'])) {
 			$this->setVarName($array['varName']);
+		}
+		if (!empty($array['validateAll'])) {
+			$this->setValidateAll($array['validateAll']);
 		}
 		parent::setOptions($array);
 	}
