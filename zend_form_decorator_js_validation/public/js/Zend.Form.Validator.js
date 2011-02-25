@@ -45,9 +45,10 @@ Zend.Form.Validator.prototype.validate = function(v) {
 Zend.Form.Validator.prototype.validateSingle = function(v, el) {
 	var errors = [];
 	for(var validatorName in v) {
-		var val = v[validatorName];
-		var msg = Zend.Form.Validator.Rules[validatorName](el.value, val.opts, val.msgs);
+		var val = v[validatorName], validator = Zend.Form.Validator.Rules[validatorName];
+		var msg = validator(el.value, val.opts, val.msgs);
 		if (msg !== undefined) {
+			ret = false;
 			errors.push(msg);
 			if (!this.validateAll) {
 				break;
@@ -93,6 +94,45 @@ var Rules = {
 	Zend_Validate_NotEmpty: function(value, opts, msgs) {
 		if (!value) {
 			return msgs.isEmpty;
+		}
+	},
+
+	Zend_Validate_LessThan: function(value, opts, msgs) {
+		if (opts.max <= value) {
+			return msgs.notLess;
+		}
+	},
+
+	Zend_Validate_GreaterThan: function(value, opts, msgs) {
+		if (opts.max >= value) {
+			return msgs.notLess;
+		}
+	},
+
+	Zend_Validate_Float: function(value, opts, msgs) {
+		switch(typeof(value)) {
+		case 'string':
+		case 'number':
+			try {
+				parseFloat(value);s
+			} catch(e) {
+				return msgs.notFloat;
+			}
+			break;
+		default:
+			return msgs.invalid;
+		}
+	},
+
+	Zend_Validate_Between: function(value, opts, msgs) {
+		if (opts.strict) {
+			if (opts.min >= value || value >= opts.max) {
+				return msgs.notBetweenStrict;
+			}
+		} else {
+			if (opts.min > value || value > opts.max) {
+				return msgs.notBetween;
+			}
 		}
 	}
 }

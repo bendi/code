@@ -16,13 +16,12 @@ class ElementValidators {
 	}
 
 	/**
-	 * @param $val
+	 *
+	 * @param string/array $name
+	 * @param string $fn
 	 * @throws Exception
 	 */
 	public function add($val) {
-		if (empty($val)) {
-			return;
-		}
 		if (func_num_args() == 1) {
 			if (is_array($val)) {
 				list($name, $ord, $opts, $msgs) = $val;
@@ -78,7 +77,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	private static $printValidatorJs = false;
 
 	private $_validateAll = false;
-	private $_scriptDir = '/js/';
+	private $_scriptDir = '/resources/script/';
 
 	public function setValidateAll($validateAll) {
 		$this->_validateAll = $validateAll;
@@ -148,6 +147,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	const ORDER_DIGITS 			= 30;
 	const ORDER_ALNUM 			= 40;
 	const ORDER_REGEX 			= 50;
+	const ORDER_LESS_THAN		= 60;
 
 	/**
 	 *
@@ -177,8 +177,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 				);
 				break;
 			case 'Zend_Validate_Regex':
-				$pattern = $validator->getPattern();
-				$opts = array('pattern' => $pattern);
+				$opts = array('pattern' => $validator->getPattern());
 				$jsMsgs = array('notMatch' => $msgs[Zend_Validate_Regex::NOT_MATCH]);
 				$ord = self::ORDER_REGEX;
 				break;
@@ -192,6 +191,36 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 			case 'Zend_Validate_NotEmpty':
 				$ord = self::ORDER_REQUIRED;
 				$jsMsgs = array('isEmpty' => $msgs[Zend_Validate_NotEmpty::IS_EMPTY]);
+				break;
+			case 'Zend_Validate_LessThan':
+				$ord = self::ORDER_LESS_THAN;
+				$jsMsgs = array('notLess' => $msgs[Zend_Validate_LessThan::NOT_LESS]);
+				$opts = array('max' => $validator->getMax());
+				break;
+			case 'Zend_Validate_GreaterThan':
+				$ord = self::ORDER_LESS_THAN;
+				$jsMsgs = array('notGreater' => $msgs[Zend_Validate_GreaterThan::NOT_GREATER]);
+				$opts = array('min' => $validator->getMin());
+				break;
+			case 'Zend_Validate_Float':
+				$ord = self::ORDER_LESS_THAN;
+				$jsMsgs = array(
+					'invalid' 	=> $msgs[Zend_Validate_Float::INVALID],
+					'notFloat' 	=> $msgs[Zend_Validate_Float::NOT_FLOAT]
+				);
+				$opts = array('min' => $validator->getMin());
+				break;
+			case 'Zend_Validate_Between':
+				$ord = self::ORDER_LESS_THAN;
+				$jsMsgs = array(
+					'notBetween' => $msgs[Zend_Validate_Between::NOT_BETWEEN],
+					'notBetweenStrict' => $msgs[Zend_Validate_Between::NOT_BETWEEN_STRICT]
+				);
+				$opts = array(
+					'min' => $validator->getMin(),
+					'max' => $validator->getMax(),
+					'inclusive' => (bool) $validator->getInclusive()
+				);
 				break;
 			default:
 				return null;
