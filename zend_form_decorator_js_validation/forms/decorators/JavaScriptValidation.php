@@ -77,7 +77,7 @@ class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstrac
 	private static $printValidatorJs = false;
 
 	private $_validateAll = false;
-	private $_scriptDir = '/resources/script/';
+	private $_scriptDir = '/js/';
 
 	public function setValidateAll($validateAll) {
 		$this->_validateAll = $validateAll;
