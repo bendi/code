@@ -16,12 +16,13 @@ class ElementValidators {
 	}
 
 	/**
-	 *
-	 * @param string/array $name
-	 * @param string $fn
+	 * @param $val
 	 * @throws Exception
 	 */
 	public function add($val) {
+		if (empty($val)) {
+			return;
+		}
 		if (func_num_args() == 1) {
 			if (is_array($val)) {
 				list($name, $ord, $opts, $msgs) = $val;
