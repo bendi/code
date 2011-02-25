@@ -6,3 +6,14 @@ This class WILL:
 
 This class WILL NOT:
 - require external JS libraries
+- you just need to copy Zend.Form.Validator.js into your script directory
+
+Options:
+- validateAll (boolean / false) - set this to true if you want to run all
+validation rules at once and display all messages, otherwise rules will be called one
+at a time thus forcing user to revalidate after entering corrected values
+default: false
+
+- scriptDir (string / /resources/script/) - points to the location of your script
+directory
+default: /resources/script/
