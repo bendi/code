@@ -48,7 +48,6 @@ Zend.Form.Validator.prototype.validateSingle = function(v, el) {
 		var val = v[validatorName];
 		var msg = Zend.Form.Validator.Rules[validatorName](el.value, val.opts, val.msgs);
 		if (msg !== undefined) {
-			ret = false;
 			errors.push(msg);
 			if (!this.validateAll) {
 				break;
