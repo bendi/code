@@ -64,7 +64,7 @@ var Rules = {
 	Zend_Validate_StringLength: function(value, opts, msgs) {
 		if (!value || value.length < opts.min) {
 			return msgs.tooShort;
-		} else if (opts.max !== undefined && value > opts.max) {
+		} else if (opts.max !== undefined && value.length > opts.max) {
 			return msgs.tooLong;
 		}
 	},
@@ -125,7 +125,7 @@ var Rules = {
 	},
 
 	Zend_Validate_Between: function(value, opts, msgs) {
-		if (opts.strict) {
+		if (opts.inclusive) {
 			if (opts.min >= value || value >= opts.max) {
 				return msgs.notBetweenStrict;
 			}
