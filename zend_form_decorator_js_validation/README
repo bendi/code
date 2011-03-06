@@ -17,3 +17,9 @@ default: false
 - scriptDir (string / /js/) - points to the location of your script
 directory
 default: /js/
+
+
+Gists:
+- usage: https://gist.github.com/847930
+- custom validator (php part): https://gist.github.com/847913
+- custom validator (javascript part): https://gist.github.com/847910
