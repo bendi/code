@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.code.bedkowski.pl/memoize"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    targetNamespace="http://www.code.bedkowski.pl/memoize"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+   <xsd:element name="use-method-cache">
+      <xsd:complexType>
+	    <xsd:attribute name="id" type="xsd:string" fixed="useMethodCache" />
+	    <xsd:attribute name="config-location" type="xsd:string" use="required"/>
+	    <xsd:attribute name="cache-name" type="xsd:string" use="required" />
+      </xsd:complexType>
+   </xsd:element>
+
+</xsd:schema>

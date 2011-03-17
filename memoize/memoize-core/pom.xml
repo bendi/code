@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>pl.bedkowski.code</groupId>
+	<artifactId>memoize-core</artifactId>
+	<packaging>jar</packaging>
+	<name>memoize-core</name>
+	<version>1.0.0</version>
+
+
+	<parent>
+		<groupId>pl.bedkowski.code</groupId>
+		<artifactId>pl.bedkowski.code.memoize</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+
+	<properties>
+		<spring.version>3.0.5.RELEASE</spring.version>
+		<commons-lang.version>2.5</commons-lang.version>
+		<ehcache.version>1.6.2</ehcache.version>
+		<cglib-nodep.version>2.2</cglib-nodep.version>
+		<aspectj.version>1.6.10</aspectj.version>
+	</properties>
+
+	<build>
+		<plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-jar-plugin</artifactId>
+	        <version>2.2</version>
+	        <configuration>
+				<includes>
+            		<include>**/*.xsd</include>
+            		<include>**/*.class</include>
+          		</includes>
+      	        </configuration>
+	      </plugin>
+	    </plugins>
+	</build>
+	<dependencies>
+
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+			<artifactId>memoize-annotations</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>${aspectj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${aspectj.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>${cglib-nodep.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>${ehcache.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>${commons-lang.version}</version>
+		</dependency>
+
+		<dependency>
+		   <groupId>com.google.collections</groupId>
+		   <artifactId>google-collections</artifactId>
+		   <version>1.0</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
