@@ -32,7 +32,7 @@
 
         -->
 
-    <cache name="org.sample.cache.METHOD_CACHE"
+    <cache name="pl.bedkowski.code.memoize.sample.METHOD_CACHE"
         maxElementsInMemory="300"
         eternal="false"
         timeToIdleSeconds="500"
