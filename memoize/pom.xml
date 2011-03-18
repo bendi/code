@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pl.bedkowski.code</groupId>
-	<artifactId>pl.bedkowski.code.memoize</artifactId>
+	<artifactId>memoize</artifactId>
 	<packaging>pom</packaging>
 	<name>memoize</name>
 	<version>1.0.0</version>
@@ -43,6 +43,14 @@
 			</plugin>
 
 		</plugins>
+
+		<extensions>
+	      <extension>
+	        <groupId>org.apache.maven.wagon</groupId>
+	        <artifactId>wagon-ftp</artifactId>
+	        <version>1.0-beta-7</version>
+	      </extension>
+	    </extensions>
 	</build>
 
 	<modules>
@@ -50,4 +58,10 @@
 		<module>memoize-core</module>
 	</modules>
 
+	 <distributionManagement>
+	    <repository>
+	      <id>repo.bedkowski.pl</id>
+	      <url>ftp://bendi.vot.pl/maven2</url>
+	    </repository>
+	  </distributionManagement>
 </project>

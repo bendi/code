@@ -11,7 +11,7 @@
 
 	<parent>
 		<groupId>pl.bedkowski.code</groupId>
-		<artifactId>pl.bedkowski.code.memoize</artifactId>
+		<artifactId>memoize</artifactId>
 		<version>1.0.0</version>
 	</parent>
 
@@ -34,6 +34,7 @@
 				<includes>
             		<include>**/*.xsd</include>
             		<include>**/*.class</include>
+					<include>META-INF/*.*</include>
           		</includes>
       	        </configuration>
 	      </plugin>
