@@ -9,7 +9,9 @@
 	<version>1.0.0</version>
 
 	<properties>
-		<maven.eclipse.plugin>2.7</maven.eclipse.plugin>
+		<maven-eclipse-plugin.version>2.7</maven-eclipse-plugin.version>
+		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<wagon-ftp.version>1.0-beta-7</wagon-ftp.version>
 	</properties>
 
 	<build>
@@ -29,13 +31,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>${maven.eclipse.plugin}</version>
+				<version>${maven-eclipse-plugin.version}</version>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -45,12 +47,12 @@
 		</plugins>
 
 		<extensions>
-	      <extension>
-	        <groupId>org.apache.maven.wagon</groupId>
-	        <artifactId>wagon-ftp</artifactId>
-	        <version>1.0-beta-7</version>
-	      </extension>
-	    </extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>${wagon-ftp.version}</version>
+			</extension>
+		</extensions>
 	</build>
 
 	<modules>
@@ -58,10 +60,10 @@
 		<module>memoize-core</module>
 	</modules>
 
-	 <distributionManagement>
-	    <repository>
-	      <id>repo.bedkowski.pl</id>
-	      <url>ftp://bendi.vot.pl/maven2</url>
-	    </repository>
-	  </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>repo.bedkowski.pl</id>
+			<url>ftp://bendi.vot.pl/maven2</url>
+		</repository>
+	</distributionManagement>
 </project>
