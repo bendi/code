@@ -11,7 +11,10 @@
 	<properties>
 		<maven-eclipse-plugin.version>2.7</maven-eclipse-plugin.version>
 		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>2.5</maven-resources-plugin.version>
 		<wagon-ftp.version>1.0-beta-7</wagon-ftp.version>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
