@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:memoize="http://www.code.bedkowski.pl/memoize"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+
+	http://www.code.bedkowski.pl/memoize
+	http://www.code.bedkowski.pl/memoize/memoize.xsd">
+
+
+	<context:component-scan base-package="pl.bedkowski.code.memoize.sample" />
+	<context:annotation-config />
+	<context:spring-configured />
+
+  	<memoize:use-method-cache
+  		config-location="classpath:ehcache.xml"
+  		cache-name="pl.bedkowski.code.memoize.sample.METHOD_CACHE" />
+
+</beans>

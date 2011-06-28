@@ -1,0 +1,25 @@
+Zend framework decorator for enabling pure client-side validation.
+
+This class WILL:
+- add client side validators for each server-side validator
+- add onsubmit handler to form in order to perform client-side validation
+
+This class WILL NOT:
+- require external JS libraries
+- you just need to copy Zend.Form.Validator.js into your script directory
+
+Options:
+- validateAll (boolean / false) - set this to true if you want to run all
+validation rules at once and display all messages, otherwise rules will be called one
+at a time thus forcing user to revalidate after entering corrected values
+default: false
+
+- scriptDir (string / /js/) - points to the location of your script
+directory
+default: /js/
+
+
+Gists:
+- usage: https://gist.github.com/847930
+- custom validator (php part): https://gist.github.com/847913
+- custom validator (javascript part): https://gist.github.com/847910
