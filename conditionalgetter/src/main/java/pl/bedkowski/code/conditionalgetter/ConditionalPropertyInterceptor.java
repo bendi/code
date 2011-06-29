@@ -40,11 +40,11 @@ public class ConditionalPropertyInterceptor<T> implements MethodInterceptor {
 		String conditionPropertyName = StringUtils.uncapitalize(propertyName) + suffix;
 		PropertyDescriptor conditionDescriptor = PropertyUtils.getPropertyDescriptor(myBean, conditionPropertyName);
 		if (conditionDescriptor == null) {
-			throw new IllegalArgumentException("Cannot find descriptor for property: " + conditionPropertyName);
+			throw new NoSuchMethodException("Missing is"+StringUtils.capitalize(conditionPropertyName) + " method for property: " + StringUtils.uncapitalize(propertyName));
 		}
 		Method condition = conditionDescriptor.getReadMethod();
 		if (condition == null) {
-			throw new IllegalAccessError("Cannot find gettter for property: " + conditionPropertyName);
+			throw new NoSuchMethodException("Missing is"+StringUtils.capitalize(conditionPropertyName) + " method for property: " + StringUtils.uncapitalize(propertyName));
 		}
 		if ((Boolean) condition.invoke(myBean)) {
 			return method.invoke(myBean);
