@@ -10,7 +10,8 @@
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
-			<version>2.2</version>
+			<version>2.2.2</version>
+			<classifier>jdk15</classifier>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -40,4 +41,11 @@
 			<version>1.5.8</version>
 		</dependency>
 	</dependencies>
+
+  <repositories>
+    <repository>
+      <id>repo.bedkowski.pl</id>
+      <url>http://repo.bedkowski.pl/maven2</url>
+    </repository>
+  </repositories>
 </project>

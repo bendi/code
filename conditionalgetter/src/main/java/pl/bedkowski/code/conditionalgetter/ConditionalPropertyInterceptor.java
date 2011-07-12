@@ -21,8 +21,8 @@ public class ConditionalPropertyInterceptor<T> implements MethodInterceptor {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T>  T create(T myBean, String suffix) {
-		return (T) Enhancer.create(myBean.getClass(), new ConditionalPropertyInterceptor<T>(myBean, suffix));
+	public static <T> T create(T myBean, String suffix) {
+		return Enhancer.create((Class<T>)myBean.getClass(), new ConditionalPropertyInterceptor<T>(myBean, suffix));
 	}
 
 	public Object intercept(Object obj, Method method, Object[] args,
