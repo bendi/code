@@ -78,7 +78,7 @@ var Rules = {
 	},
 
 	Zend_Validate_Regex: function(value, opts, msgs) {
-		if (!value || !opts.regex.test(value)) {
+		if (!value || !(new RegExp(opts.pattern)).test(value)) {
 			return msgs.notMatch;
 		}
 	},

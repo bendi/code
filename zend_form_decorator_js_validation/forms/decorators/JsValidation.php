@@ -22,6 +22,9 @@ class ElementValidators {
 	 * @throws Exception
 	 */
 	public function add($val) {
+		if (is_null($val)) {
+			return;
+		}
 		if (func_num_args() == 1) {
 			if (is_array($val)) {
 				list($name, $ord, $opts, $msgs) = $val;
