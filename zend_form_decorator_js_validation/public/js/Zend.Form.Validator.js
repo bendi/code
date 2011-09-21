@@ -1,3 +1,15 @@
+/*
+ *
+ * LICENSE
+ *
+ * This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.
+ *
+ * @copyright  Copyright (c) 2010-2011 Marek B«dkowski
+ * @license    New BSD License
+ *
+ * @package Zend.Form.Validator
+ */
 (function(){
 var MAX_RETRIES = 10;
 Zend = this.Zend || {};

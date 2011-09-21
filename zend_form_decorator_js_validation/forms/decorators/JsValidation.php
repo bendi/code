@@ -1,6 +1,17 @@
 <?php
 
-
+/*
+ *
+ * LICENSE
+ *
+ * This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.
+ *
+ * @copyright  Copyright (c) 2010-2011 Marek B«dkowski
+ * @license    New BSD License
+ *
+ * @package ZendFormJsValidation
+ */
 class ElementValidators {
 
 	private $list = array();
@@ -74,6 +85,18 @@ class ElementValidators {
 	}
 };
 
+/*
+ *
+ * LICENSE
+ *
+ * This source file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE.
+ *
+ * @copyright  Copyright (c) 2010-2011 Marek B«dkowski
+ * @license    New BSD License
+ *
+ * @package ZendFormJsValidation
+ */
 class My_Form_Decorator_JavaScriptValidation extends Zend_Form_Decorator_Abstract {
 
 	private static $instances = 0;
