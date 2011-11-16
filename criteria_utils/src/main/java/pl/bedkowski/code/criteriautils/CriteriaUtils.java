@@ -18,6 +18,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.transform.AliasToBeanResultTransformer;
@@ -35,8 +36,22 @@ public class CriteriaUtils {
 	 * @param entityManager
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getSummaries(Class<T> clz, Criterion dates, EntityManager entityManager, String... skipProperties) {
+		return getSummaries(clz, null, dates, entityManager, skipProperties);
+	}
+
+	/**
+	 *
+	 * @param <T>
+	 * @param clz
+	 * @param ord
+	 * @param dates
+	 * @param entityManager
+	 * @param skipProperties
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getSummaries(Class<T> clz, Order ord, Criterion dates, EntityManager entityManager, String... skipProperties) {
 		Session sess = (Session) entityManager.getDelegate();
 		Criteria crit = sess.createCriteria(clz);
 		List<String> skipPropertiesList = Lists.newArrayList("id", "date");
@@ -45,6 +60,9 @@ public class CriteriaUtils {
 		}
 		crit.setProjection(getSumarriesProjectionList(clz, skipPropertiesList));
 		crit.add(dates);
+		if (ord != null) {
+			crit.addOrder(ord);
+		}
 		crit.setResultTransformer(new AliasToBeanResultTransformer(clz));
 		T foundInstance = (T)crit.uniqueResult();
 
