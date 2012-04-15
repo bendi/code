@@ -125,7 +125,7 @@ public class AppModule {
 
 	@Contribute(ComponentClassTransformWorker2.class)
 	public static void provideWorkers(OrderedConfiguration<ComponentClassTransformWorker2> workers) {
-		workers.addInstance("HelpTextMixinWorker", SelectModelPropertyWorker.class);
+		workers.addInstance(SelectModelPropertyWorker.class.getSimpleName(), SelectModelPropertyWorker.class);
 	}
 
 //	public static void contributeValueEncoderSource(MappedConfiguration<Class<Color>, ValueEncoderFactory<Color>> configuration) {
