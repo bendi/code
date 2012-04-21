@@ -9,3 +9,7 @@ In order to enable it you need to:
 There are 2 gotchas to keep in mind:
 - the getter method for a field mustn't exist
 - the field cannot be annotated with @Property annotation
+
+Description at:
+
+http://2lips.pl/blog/tapestry-selectmodel-wrapping/
