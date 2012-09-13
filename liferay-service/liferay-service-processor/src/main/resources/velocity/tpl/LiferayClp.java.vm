@@ -1,0 +1,60 @@
+#parse("velocity/tpl/inc/macros.vm")
+
+package ${packageName};
+
+import com.liferay.portal.kernel.util.ClassLoaderProxy;
+import com.liferay.portal.kernel.util.MethodHandler;
+import com.liferay.portal.kernel.util.MethodKey;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+public class ${className}Clp implements ${className}  {
+
+	private static Log _log = LogFactoryUtil.getLog(${className}Clp.class);
+
+	private ClassLoaderProxy _classLoaderProxy;
+
+	#foreach($entry in $methods.entrySet())
+	#set( $method = $entry.value )
+	#set( $method_unique_name = $entry.key )
+	private MethodKey _${method_unique_name};
+
+	public #method(${method.returnType} ${method.simpleName} ${method.parameters} ${method.thrownTypes})
+	{
+		MethodHandler methodHandler = new MethodHandler(_${method_unique_name} #args(${method.parameters} true));
+		try {
+			#if( ${method.returnType} != 'void' ) return (${method.returnType})#end _classLoaderProxy.invoke(methodHandler);
+		} catch (Throwable t) {
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException) t;
+			}
+			#foreach($exception in $method.thrownTypes)
+				else if ( t instanceof $exception) {
+					throw ($exception) t;
+				}
+			#end
+			else {
+				throw new RuntimeException(t.getClass().getName() + " is not a valid exception");
+			}
+		}
+	}
+	#end
+
+	public ${className}Clp(ClassLoaderProxy classLoaderProxy) {
+		_classLoaderProxy = classLoaderProxy;
+		#foreach($entry in $methods.entrySet())
+		#set( $method = $entry.value )
+		#set( $method_unique_name = $entry.key )
+		_${method_unique_name} = new MethodKey(_classLoaderProxy.getClassName(), "${method.simpleName}"#foreach($param in $method.parameters), ${param.asType()}.class#end);
+		#end
+	}
+
+	#if($initMethod)
+	public void $initMethod() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Created instance");
+		}
+	}
+	#end
+
+}

@@ -1,0 +1,18 @@
+package ${packageName};
+
+import java.util.Date;
+
+public class ${className}Version {
+
+	private final String version = "${version}";
+	private final Date date = new Date(${generatedDate}L);
+	
+	public String getVersion() {
+		return version;
+	}
+	public Date getDate() {
+		return date;
+	}
+	
+
+}
