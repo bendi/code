@@ -1,5 +1,7 @@
 package pl.bedkowski.code.liferay.service.processor.util;
 
+import javax.lang.model.element.Name;
+
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
@@ -12,8 +14,8 @@ public class UniqueNameSupplier {
 	 * @param name
 	 * @return
 	 */
-	public String supplyUniqueName(String name) {
-		return checkName(name, occurances);
+	public String supplyUniqueName(Name name) {
+		return checkName(name.toString(), occurances);
 	}
 
 	/**

@@ -2,7 +2,6 @@ package pl.bedkowski.code.liferay.service.processor.controller;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +16,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -108,7 +105,9 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 	private ProcessorModel doModel(TypeElement iface) {
 		LiferayService ls = iface.getAnnotation(LiferayService.class);
 
-		ProcessorModel model = new ProcessorModel(pkg(iface), iface.getSimpleName(), ls.value(), ls.initMethod(), getMethods(iface));
+		List<? extends Element> allMembers = processingEnv.getElementUtils().getAllMembers(iface);
+
+		ProcessorModel model = new ProcessorModel(iface, ls.value(), ls.initMethod(), getMethodsToProxy(allMembers));
 
 		try {
 			dispatch(new AfterDoModelEvent(iface, model));
@@ -142,24 +141,22 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 
 	/**
 	 *
-	 * @param classElement
+	 * @param allMembers
 	 * @return
 	 */
-	private Map<String, Element> getMethods(TypeElement classElement) {
+	private Map<String, Element> getMethodsToProxy(List<? extends Element> allMembers) {
 		Map<String, Element> methods = new HashMap<String, Element>();
-
-		List<? extends Element> members = processingEnv.getElementUtils().getAllMembers(classElement);
 
 		UniqueNameSupplier uns = new UniqueNameSupplier();
 
-		for (Element member : members) {
+		for (Element member : allMembers) {
 			if (isInterfaceMethod(member)) {
-				String methodName = uns.supplyUniqueName(member.getSimpleName().toString());
+				String methodName = uns.supplyUniqueName(member.getSimpleName());
 				methods.put(methodName, member);
 			}
 		}
 
-		return Collections.unmodifiableMap(methods);
+		return methods;
 	}
 
 	/**
@@ -171,16 +168,6 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 		return element.getKind() == ElementKind.METHOD &&
 				!element.getModifiers().contains(Modifier.NATIVE) &&
 				element.getModifiers().contains(Modifier.ABSTRACT);
-	}
-
-	/**
-	 *
-	 * @param typeElement
-	 * @return
-	 */
-	private static final Name pkg(TypeElement typeElement) {
-		PackageElement packageElement = (PackageElement) typeElement.getEnclosingElement();
-		return packageElement.getQualifiedName();
 	}
 
 	/**

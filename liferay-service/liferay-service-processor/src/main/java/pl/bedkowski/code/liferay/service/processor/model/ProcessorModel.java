@@ -8,6 +8,8 @@ import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 
 public class ProcessorModel {
 
@@ -32,16 +34,15 @@ public class ProcessorModel {
 
 	/**
 	 *
-	 * @param packageName
-	 * @param className
+	 * @param iface
 	 * @param classLoader
 	 * @param initMethod
 	 * @param methods
 	 */
-	public ProcessorModel(Name packageName, Name className, String classLoader,
+	public ProcessorModel(TypeElement iface, String classLoader,
 			String initMethod, Map<String, Element> methods) {
-		modelMap.put(KEY_CLASS_NAME, className);
-		modelMap.put(KEY_PACKAGE_NAME, packageName);
+		modelMap.put(KEY_CLASS_NAME, iface.getSimpleName());
+		modelMap.put(KEY_PACKAGE_NAME, pkg(iface));
 		modelMap.put(KEY_METHODS, methods);
 		modelMap.put(KEY_CLASS_LOADER, classLoader);
 		modelMap.put(KEY_INIT_METHOD, initMethod);
@@ -94,5 +95,15 @@ public class ProcessorModel {
 	@SuppressWarnings("unchecked")
 	private <T> T get(String key) {
 		return (T) modelMap.get(key);
+	}
+
+	/**
+	 *
+	 * @param typeElement
+	 * @return
+	 */
+	private static final Name pkg(TypeElement typeElement) {
+		PackageElement packageElement = (PackageElement) typeElement.getEnclosingElement();
+		return packageElement.getQualifiedName();
 	}
 }
