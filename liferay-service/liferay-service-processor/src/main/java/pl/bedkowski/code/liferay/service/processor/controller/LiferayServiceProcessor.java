@@ -36,10 +36,8 @@ import pl.bedkowski.code.liferay.service.processor.exception.ProcessorException;
 import pl.bedkowski.code.liferay.service.processor.exception.ProcessorLifecycleException;
 import pl.bedkowski.code.liferay.service.processor.listener.ProcessorLifecycleEventListener;
 import pl.bedkowski.code.liferay.service.processor.model.ProcessorModel;
+import pl.bedkowski.code.liferay.service.processor.util.UniqueNameSupplier;
 import pl.bedkowski.code.liferay.service.processor.view.ProcessorView;
-
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 
 /**
  *
@@ -151,26 +149,17 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 		Map<String, Element> methods = new HashMap<String, Element>();
 
 		List<? extends Element> members = processingEnv.getElementUtils().getAllMembers(classElement);
-		Multiset<String> occurances = HashMultiset.create();
+
+		UniqueNameSupplier uns = new UniqueNameSupplier();
 
 		for (Element member : members) {
 			if (isInterfaceMethod(member)) {
-				String methodName = member.getSimpleName().toString();
-				methodName = checkMethodName(methodName, occurances);
+				String methodName = uns.supplyUniqueName(member.getSimpleName().toString());
 				methods.put(methodName, member);
 			}
 		}
 
 		return Collections.unmodifiableMap(methods);
-	}
-
-	private static String checkMethodName(String methodName, Multiset<String> occurances) {
-		occurances.add(methodName);
-		int count = occurances.count(methodName);
-		if (count > 1) {
-			methodName = checkMethodName(methodName + (count - 1), occurances);
-		}
-		return methodName;
 	}
 
 	/**
