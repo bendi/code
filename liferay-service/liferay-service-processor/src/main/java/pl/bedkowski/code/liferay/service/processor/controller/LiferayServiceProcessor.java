@@ -156,16 +156,21 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 		for (Element member : members) {
 			if (isInterfaceMethod(member)) {
 				String methodName = member.getSimpleName().toString();
-				occurances.add(methodName);
-				int count = occurances.count(methodName);
-				if (count > 1) {
-					methodName += count - 1;
-				}
+				methodName = checkMethodName(methodName, occurances);
 				methods.put(methodName, member);
 			}
 		}
 
 		return Collections.unmodifiableMap(methods);
+	}
+
+	private static String checkMethodName(String methodName, Multiset<String> occurances) {
+		occurances.add(methodName);
+		int count = occurances.count(methodName);
+		if (count > 1) {
+			methodName = checkMethodName(methodName + (count - 1), occurances);
+		}
+		return methodName;
 	}
 
 	/**
