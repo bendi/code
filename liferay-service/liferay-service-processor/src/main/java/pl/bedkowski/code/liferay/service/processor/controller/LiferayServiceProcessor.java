@@ -73,7 +73,7 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 					viewClassName = DEFAULT_PROCESSOR_VIEW;
 				}
 
-				processorView = newProcessor(viewClassName);
+				processorView = newProcessorView(viewClassName);
 			} catch(Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -187,7 +187,7 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private static ProcessorView newProcessor(String viewClassName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+	private static ProcessorView newProcessorView(String viewClassName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		Class<? extends ProcessorView> viewClass = Class.forName(viewClassName).asSubclass(ProcessorView.class);
 		return viewClass.newInstance();
 	}
