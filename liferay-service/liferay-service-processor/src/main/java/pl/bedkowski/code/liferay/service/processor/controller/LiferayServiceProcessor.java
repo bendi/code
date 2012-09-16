@@ -2,9 +2,7 @@ package pl.bedkowski.code.liferay.service.processor.controller;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -15,7 +13,6 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -33,6 +30,7 @@ import pl.bedkowski.code.liferay.service.processor.exception.ProcessorException;
 import pl.bedkowski.code.liferay.service.processor.exception.ProcessorLifecycleException;
 import pl.bedkowski.code.liferay.service.processor.listener.ProcessorLifecycleEventListener;
 import pl.bedkowski.code.liferay.service.processor.model.ProcessorModel;
+import pl.bedkowski.code.liferay.service.processor.util.InterfaceMethodsSupplier;
 import pl.bedkowski.code.liferay.service.processor.util.UniqueNameSupplier;
 import pl.bedkowski.code.liferay.service.processor.view.ProcessorView;
 
@@ -107,7 +105,9 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 
 		List<? extends Element> allMembers = processingEnv.getElementUtils().getAllMembers(iface);
 
-		ProcessorModel model = new ProcessorModel(iface, ls.value(), ls.initMethod(), getMethodsToProxy(allMembers));
+		InterfaceMethodsSupplier ims = new InterfaceMethodsSupplier(new UniqueNameSupplier());
+
+		ProcessorModel model = new ProcessorModel(iface, ls.value(), ls.initMethod(), ims.supplyMethods(allMembers));
 
 		try {
 			dispatch(new AfterDoModelEvent(iface, model));
@@ -137,37 +137,6 @@ public class LiferayServiceProcessor extends AbstractProcessor implements Proces
 			throw new RuntimeException(e);
 		}
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "LiferayService for: " + iface.getQualifiedName(), iface);
-	}
-
-	/**
-	 *
-	 * @param allMembers
-	 * @return
-	 */
-	private Map<String, Element> getMethodsToProxy(List<? extends Element> allMembers) {
-		Map<String, Element> methods = new HashMap<String, Element>();
-
-		UniqueNameSupplier uns = new UniqueNameSupplier();
-
-		for (Element member : allMembers) {
-			if (isInterfaceMethod(member)) {
-				String methodName = uns.supplyUniqueName(member.getSimpleName());
-				methods.put(methodName, member);
-			}
-		}
-
-		return methods;
-	}
-
-	/**
-	 *
-	 * @param element
-	 * @return
-	 */
-	protected boolean isInterfaceMethod(Element element) {
-		return element.getKind() == ElementKind.METHOD &&
-				!element.getModifiers().contains(Modifier.NATIVE) &&
-				element.getModifiers().contains(Modifier.ABSTRACT);
 	}
 
 	/**
