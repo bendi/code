@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>jQuery+RequireJS Sample Page</title>
+        <!-- This is a special version of jQuery with RequireJS built-in -->
+        <script src="lib/require-jquery.js"></script>
+        <script>
+            require.config({
+            	baseUrl: 'scripts',
+                paths: {
+                    "cs": "../lib/cs",
+                    "coffee-script": "../lib/coffee-script",
+                    "underscore": "../lib/underscore",
+                    "jade": "../lib/jade",
+                    "views": "../views"
+                },
+                shim: {
+                	underscore: {
+                		init: function() {
+                			return _.noConflict();
+                		},
+                		exports: '_'
+                	}
+                }
+            });
+            require(["cs!main"]);
+        </script>
+    </head>
+    <body>
+        <h1>jQuery+RequireJS Sample Page</h1>
+        <p>Look at source or inspect the DOM to see how it works.</p>
+        <input type="button" value="Update setting" id="us" >
+    </body>
+</html>
