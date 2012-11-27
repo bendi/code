@@ -1,0 +1,11 @@
+h4 My sample jade template #{date}
+hr
+table(border=1, cellpadding=5, cellspacing=0)
+	thead
+		tr
+			th(colspan=2) Cities
+	tbody
+		each name, abbr in cities
+			tr
+				td #{abbr}
+				td #{name}
