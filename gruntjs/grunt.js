@@ -7,7 +7,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-env');
-  grunt.loadNpmTasks('grunt-jasmine-task');
   grunt.loadTasks('tasks');
 
   // remove when 0.4.0
@@ -73,16 +72,6 @@ module.exports = function(grunt) {
           'webapp-tmp/scripts/**.js' : 'webapp/scripts/**/*.coffee'
         }
       }
-    },
-    jasmine: {
-      index: ['test/htmlRunner.html']
-    },
-    instrument: {
-      options : {
-        basePath : 'webapp-tmp/scripts2',
-        baseDir : 'webapp-tmp/scripts'
-      },
-      files: ['webapp-tmp/scripts/**']
     },
     requirejs: {
       compile: {
@@ -187,6 +176,4 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'clean coffee requirejs min preprocess inline:app rm');
-  grunt.registerTask('build', 'env:build clean coffee requirejs min preprocess rm');
-  grunt.registerTask('coverage', 'env:dev clean coffee instrument jasmine');
 };
