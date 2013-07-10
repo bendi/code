@@ -5,5 +5,5 @@
 
     <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
-    <source path="validation"/>
+    <source path="iface"/>
 </module>

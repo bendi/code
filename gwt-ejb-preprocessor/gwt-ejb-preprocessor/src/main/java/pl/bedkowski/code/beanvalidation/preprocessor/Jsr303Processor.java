@@ -24,9 +24,11 @@ import javax.persistence.Entity;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-@SupportedAnnotationTypes({"javax.persistence.Entity", "pl.bedkowski.code.jdd.gwt_ejb_preprocessor.BeanValidation"})
+@SupportedAnnotationTypes({"javax.persistence.Entity", Jsr303Processor.PKG_NAME + ".preprocessor.BeanValidation"})
 @SupportedSourceVersion(SourceVersion.RELEASE_5)
 public class Jsr303Processor extends AbstractProcessor {
+
+	public static final String PKG_NAME = "pl.bedkowski.code.beanvalidation";
 
 	@SuppressWarnings("unchecked")
 	private static final Class<BeanValidationProcessingStrategy<?>>[] SUPPORTED_CONSTRAINTS = new Class[] {
@@ -97,14 +99,14 @@ public class Jsr303Processor extends AbstractProcessor {
 		Writer writer = jfo.openWriter();
 
 		writer.write("package " + pkg + ";\n\n");
-		writer.write("import static pl.bedkowski.code.jdd.validation.Constraints.*; \n\n");
+		writer.write("import static " + PKG_NAME + ".iface.Constraints.*; \n\n");
 		writer.write("public class " + simpleName + "Constraints { \n");
 
 		for(Entry<String, List<BeanValidationProcessingStrategy<?>>> e : constraints.entrySet()) {
 			if (e.getValue().isEmpty()) {
 				continue;
 			}
-			writer.write("\tpublic static java.util.List<pl.bedkowski.code.jdd.validation.Constraint> " + e.getKey() + "() {\n");
+			writer.write("\tpublic static java.util.List<" + PKG_NAME + ".iface.Constraint> " + e.getKey() + "() {\n");
 			writer.write("\t\treturn constraints(");
 			boolean first = true;
 			for(BeanValidationProcessingStrategy<?> av : e.getValue()) {
