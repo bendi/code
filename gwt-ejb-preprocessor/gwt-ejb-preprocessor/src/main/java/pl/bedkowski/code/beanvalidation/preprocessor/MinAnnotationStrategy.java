@@ -1,4 +1,4 @@
-package pl.bedkowski.code.jdd.gwt_ejb_preprocessor;
+package pl.bedkowski.code.beanvalidation.preprocessor;
 
 import java.util.List;
 

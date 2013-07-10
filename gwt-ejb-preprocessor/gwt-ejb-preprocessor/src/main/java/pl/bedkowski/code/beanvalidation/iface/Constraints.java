@@ -1,4 +1,4 @@
-package pl.bedkowski.code.jdd.validation;
+package pl.bedkowski.code.beanvalidation.iface;
 
 import java.math.BigInteger;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package pl.bedkowski.code.jdd.validation;
+package pl.bedkowski.code.beanvalidation.iface;
 
 public interface Constraint {
 
