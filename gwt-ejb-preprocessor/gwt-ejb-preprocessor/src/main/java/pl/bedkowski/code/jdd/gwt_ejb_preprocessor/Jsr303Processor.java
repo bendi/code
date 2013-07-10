@@ -2,6 +2,7 @@ package pl.bedkowski.code.jdd.gwt_ejb_preprocessor;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ import javax.persistence.Entity;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-@SupportedAnnotationTypes("javax.persistence.Entity")
+@SupportedAnnotationTypes({"javax.persistence.Entity", "pl.bedkowski.code.jdd.gwt_ejb_preprocessor.BeanValidation"})
 @SupportedSourceVersion(SourceVersion.RELEASE_5)
 public class Jsr303Processor extends AbstractProcessor {
 
@@ -37,7 +38,17 @@ public class Jsr303Processor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(Entity.class);
+
+		processItems(roundEnv, BeanValidation.class);
+		processItems(roundEnv, Entity.class);
+
+		return true;
+	}
+
+	private void processItems(RoundEnvironment roundEnv, Class<? extends Annotation> clazz) {
+		Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(clazz);
+
+		processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, "Found: " + entities.size());
 
 		for(Element entity : entities) {
 			try {
@@ -47,8 +58,6 @@ public class Jsr303Processor extends AbstractProcessor {
 				printError(e.getMessage(), entity);
 			}
 		}
-
-		return true;
 	}
 
 	private void processEntity(TypeElement entity) throws IOException, InstantiationException, IllegalAccessException {

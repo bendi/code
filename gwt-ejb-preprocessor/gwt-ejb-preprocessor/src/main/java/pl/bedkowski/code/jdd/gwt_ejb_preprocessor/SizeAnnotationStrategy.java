@@ -19,6 +19,12 @@ public class SizeAnnotationStrategy extends BeanValidationProcessingStrategy<Siz
 	@Override
 	protected void doRead(Size value, List<Object> params) {
 		params.add(value.min());
-		params.add(value.max());
+
+		int max = value.max();
+		if (max != Integer.MAX_VALUE) {
+			params.add(value.max());
+		} else {
+			params.add("Integer.MAX_VALUE");
+		}
 	}
 }
