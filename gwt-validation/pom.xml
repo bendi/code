@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>pl.bedkowski.code</groupId>
+	<artifactId>gwt-validation</artifactId>
+	<packaging>pom</packaging>
+	<name>gwt 2.3 bean validation</name>
+	<version>1.0.0</version>
+
+	<properties>
+		<maven-eclipse-plugin.version>2.7</maven-eclipse-plugin.version>
+		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<maven-resources-plugin.version>2.5</maven-resources-plugin.version>
+		<wagon-ftp.version>1.0-beta-7</wagon-ftp.version>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gwt.version>2.3.0</gwt.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>${maven-eclipse-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>${wagon-ftp.version}</version>
+			</extension>
+		</extensions>
+	</build>
+
+	<modules>
+		<module>gwt-validation-client</module>
+		<module>gwt-validation-entity</module>
+		<module>gwt-validation-ejb</module>
+		<module>gwt-validation-components</module>
+		<module>gwt-validation-web</module>
+		<module>gwt-validation-ear</module>
+	</modules>
+
+	<distributionManagement>
+		<repository>
+			<id>repo.bedkowski.pl</id>
+			<url>ftp://bendi.vot.pl/maven2</url>
+		</repository>
+	</distributionManagement>
+</project>

@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>gwt-validation-client</artifactId>
+	<packaging>jar</packaging>
+	<name>gwt-validation-client</name>
+
+
+	<parent>
+		<groupId>pl.bedkowski.code</groupId>
+		<artifactId>gwt-validation</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>target/generated-sources/annotations</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<compilerArguments>
+						<processor>pl.bedkowski.code.beanvalidation.preprocessor.Jsr303Processor</processor>
+					</compilerArguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/generated-sources/annotation</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>pl.bedkowski.code.beanvalidation</groupId>
+			<artifactId>gwt-ejb-preprocessor</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>pl.bedkowski.code.beanvalidation</groupId>
+			<artifactId>gwt-ejb-preprocessor</artifactId>
+			<version>0.0.1</version>
+			<classifier>sources</classifier>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<!--  uncomment my repo for gwt-ejb-preprocessor dep -->
+	<!--
+	<repositories>
+	  <repository>
+	    <id>bedkowski-pl</id>
+	    <name>Marek Bedkowski repository</name>
+	    <url>http://repo.bedkowski.pl/maven2</url>
+	  </repository>
+	</repositories>
+	-->
+
+</project>

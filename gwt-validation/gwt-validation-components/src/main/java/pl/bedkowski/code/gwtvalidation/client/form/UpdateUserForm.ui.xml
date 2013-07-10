@@ -1,0 +1,18 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui'
+    xmlns:v='urn:import:pl.bedkowski.code.gwtvalidation.client.form'>
+
+   <ui:with field="constraints" type="pl.bedkowski.code.gwtvalidation.client.UserDTOConstraints" />
+   <ui:with field="dto" type="pl.bedkowski.code.gwtvalidation.client.UserDTO" />
+
+   <v:ValidableTable ui:field="table">
+   	<v:TextRow validator="{constraints.firstName}" value="{dto.getFirstName}" ui:field="firstNameBox">
+	  <g:Label>First name</g:Label>
+      <g:TextBox/>
+   	</v:TextRow>
+   	<v:TextRow validator="{constraints.lastName}" value="{dto.getLastName}" ui:field="lastNameBox">
+      <g:Label>Last name</g:Label>
+      <g:TextBox/>
+   	</v:TextRow>
+   </v:ValidableTable>
+</ui:UiBinder>
