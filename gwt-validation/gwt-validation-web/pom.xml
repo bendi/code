@@ -135,7 +135,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>pl.bedkowski.code.jdd</groupId>
+			<groupId>pl.bedkowski.code.beanvalidation</groupId>
 			<artifactId>gwt-ejb-preprocessor</artifactId>
 			<version>0.0.1</version>
 			<classifier>sources</classifier>
