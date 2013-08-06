@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                            http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+	version="3.1">
+	<description>Application version with EJB 3.1</description>
+	<display-name>Application version with EJB 3.1</display-name>
+	<enterprise-beans>
+		<session>
+			<ejb-name>ApplicationVersion</ejb-name>
+			<ejb-class>pl.bedkowski.code.version.ejb3.ApplicationVersion</ejb-class>
+			<session-type>Singleton</session-type>
+			<init-on-startup>true</init-on-startup>
+			<env-entry>
+				<env-entry-name>version</env-entry-name>
+				<env-entry-type>java.lang.String</env-entry-type>
+				<env-entry-value>${project.version}</env-entry-value>
+				<injection-target>
+					<injection-target-class>pl.bedkowski.code.version.ejb3.ApplicationVersion</injection-target-class>
+					<injection-target-name>version</injection-target-name>
+				</injection-target>
+			</env-entry>
+			<post-construct>
+				<lifecycle-callback-method>postConstruct</lifecycle-callback-method>
+			</post-construct>
+			<pre-destroy>
+				<lifecycle-callback-method>preDestroy</lifecycle-callback-method>
+			</pre-destroy>
+		</session>
+	</enterprise-beans>
+</ejb-jar>
