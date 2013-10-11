@@ -1,4 +1,4 @@
-define(["src/MessageBus"], function(mBus) {
+define(["MessageBus"], function(mBus) {
 describe("message bus", function() {
 
   beforeEach(function() {

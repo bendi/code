@@ -2,7 +2,8 @@ require.config({
     urlArgs: 'cb=' + Math.random(),
     paths: {
         'jasmine': 'lib/jasmine-1.3.0/jasmine',
-        'jasmine-html': 'lib/jasmine-1.3.0/jasmine-html'
+        'jasmine-html': 'lib/jasmine-1.3.0/jasmine-html',
+		'MessageBus': messageBusModule
     },
     shim: {
         jasmine: {
@@ -28,10 +29,6 @@ require(['jasmine-html'], function (jasmine) {
     jasmineEnv.specFilter = function (spec) {
         return htmlReporter.specFilter(spec);
     };
-
-    var specs = [];
-
-    specs.push('spec/MessageBusSpec');
 
 	require(specs, function (spec) {
         jasmineEnv.execute();
