@@ -2,12 +2,12 @@ describe("Settings", function() {
 
   // prepare mock dependencies
   var mBusMock = jasmine.createSpyObj("mBus", ["addEventListener"]),
-	daoMock = {read: function(){
-	  return {};
-	}};
+	daoMock = jasmine.createSpyObj("daoMock", ["read"]);
 	
   beforeEach(function() {
-	//spyOn(daoMock, 'read').andCallThrough();
+	spyOn(daoMock, 'read').andCallFake(function() {
+		return {};
+	});
   });
 
   define("mBusMock", function() {
@@ -37,6 +37,7 @@ describe("Settings", function() {
 	  });
 	  it("should read dao settings", function() {
 		mBusMock.addEventListener.calls[0].args[1].call();
+		expect(daoMock.read).toHaveBeenCalledWith("settings");
 	  });
 	});
   });
