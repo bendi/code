@@ -3,7 +3,8 @@ require.config({
     paths: {
         'jasmine': 'lib/jasmine-1.3.0/jasmine',
         'jasmine-html': 'lib/jasmine-1.3.0/jasmine-html',
-		'MessageBus': messageBusModule
+		'MessageBus': messageBusModule,
+		'Settings': settingsModule
     },
     shim: {
         jasmine: {
