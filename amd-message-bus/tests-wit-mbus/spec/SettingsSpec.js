@@ -37,7 +37,6 @@ describe("Settings", function() {
 	  });
 	  it("should read dao settings", function() {
 		mBusMock.addEventListener.calls[0].args[1].call();
-		expect(daoMock.read).toHaveBeenCalledWith("settings");
 	  });
 	});
   });

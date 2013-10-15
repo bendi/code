@@ -1,8 +1,6 @@
-define(["MessageBus", "Dao"], function(mBus, dao) {
-  mBus.addEventListener("dao:init", function() {
-    var dbSettings = dao.read("settings");
-    dbSettingsReady(dbSettings);
-  });
+define(["MessageBus"], function(mBus) {
+
+  mBus.addEventListener("dao:init", dbSettingsReady);
 
   var settings = readFsSettings();
   settingsReady(settings);
