@@ -6,16 +6,16 @@ describe("Settings", function() {
   define("mBusMock", function() {
     return mBusMock;
   });
-  
+
   var r = require.config({
-	map: {
-		'Settings' : {
-			'MessageBus': 'mBusMock',
-			'Dao': 'daoMock'
-		}
-	}
+    map: {
+      'Settings' : {
+        'MessageBus': 'mBusMock',
+        'Dao': 'daoMock'
+      }
+    }
   });
-  
+
   define(["Settings"], function(s) {
     describe("Settings", function() {
       it("should register 1 event listeners", function() {
