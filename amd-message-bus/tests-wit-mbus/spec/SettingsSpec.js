@@ -1,21 +1,10 @@
 describe("Settings", function() {
 
   // prepare mock dependencies
-  var mBusMock = jasmine.createSpyObj("mBus", ["addEventListener"]),
-	daoMock = jasmine.createSpyObj("daoMock", ["read"]);
-	
-  beforeEach(function() {
-	spyOn(daoMock, 'read').andCallFake(function() {
-		return {};
-	});
-  });
+  var mBusMock = jasmine.createSpyObj("mBus", ["addEventListener"]);
 
   define("mBusMock", function() {
     return mBusMock;
-  });
-  
-  define("daoMock", function() {
-    return daoMock;
   });
   
   var r = require.config({
@@ -40,5 +29,4 @@ describe("Settings", function() {
 	  });
 	});
   });
-
 });
