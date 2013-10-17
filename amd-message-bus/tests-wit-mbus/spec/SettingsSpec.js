@@ -17,7 +17,7 @@ describe("Settings", function() {
   });
   
   define(["Settings"], function(s) {
-	describe("Settings", function() {
+    describe("Settings", function() {
       it("should register 1 event listeners", function() {
         expect(mBusMock.addEventListener.calls.length).toEqual(1);
       });
