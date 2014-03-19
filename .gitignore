@@ -5,3 +5,4 @@
 .metadata/*
 gwt-validation/gwt-validation-web/src/main/webapp/GwtValidation
 gwt-validation/gwt-validation-web/src/main/webapp/WEB-INF/deploy
+drone-leap/node_modules/

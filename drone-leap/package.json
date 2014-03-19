@@ -1,0 +1,12 @@
+{
+  "name": "leap-drone",
+  "description": "Controlling Parrot AR Drone with leap motion controller",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "cylon-leapmotion": "~0.5.0",
+    "cylon": "~0.11.2",
+    "lodash": "~2.4.1",
+    "cylon-ardrone": "~0.8.0"
+  }
+}
