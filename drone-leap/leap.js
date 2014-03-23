@@ -1,25 +1,37 @@
 var Cylon = require('cylon'),
 	_ = require("lodash");
 
-var speedAdjuster = 2.5; // higher number decreases action speed.  DO NOT set to less than 1
+var speedAdjuster = 3.5; // higher number decreases action speed.  DO NOT set to less than 1
 
 var flying = true;
 
-function move(hand) {
+var upBorder = .4,
+	downBorder = .3,
+	upInitialPosition = 10,
+	upMaxSpeed = .15;
+
+function moveSafely(direction, speed) {
+	speed = Math.min(upMaxSpeed, speed);
+	Logger.info("Moving", direction, "at speed", speed.toPrecision(3));
+}
+	
+function handHandler(hand) {
+	speedAdjuster = Math.max(1, speedAdjuster);
+	
 	var xPos = hand.palmX; // position of hand on x axis
       var yPos = hand.palmY; // position of hand on y axis
       var zPos = hand.palmZ; // position of hand on z axis
 
       var adjX = xPos / 250; // -1.5 to 1.5
       var adjXspeed = Math.abs(adjX)/ speedAdjuster; // left/right speed
-      var adjY = (yPos - 60) / 500; // 0 to .8
-      var adjYspeed = Math.abs(.4-adjY) // up/down speed
+      var adjY = (yPos - upInitialPosition) / 500; // 0 to .8
+      //var adjYspeed = Math.abs(.4-adjY) // up/down speed
       var adjZ = zPos / 250; // -2 to 2
       var adjZspeed = Math.abs(adjZ) / speedAdjuster; // front/back speed
 
       if (adjX < 0 && flying) { // flying set in takeoff() and land() to prevent actions while drone landed
         stopped = false;
-		Logger.info("Move left", "speed: ", adjXspeed);
+		//Logger.info("Move left", "speed: ", adjXspeed);
 		/*
         $(".left").attr({id: 'highlight'})
         $(".right").attr({id: ''})
@@ -32,7 +44,7 @@ function move(hand) {
 		*/
       } else if (adjX > 0 && flying) {
         stopped = false;
-		Logger.info("Move right", "speed: ", adjXspeed);
+		//Logger.info("Move right", "speed: ", adjXspeed);
 /*
         $(".right").attr({id: 'highlight'})
         $(".left").attr({id: ''})
@@ -45,9 +57,9 @@ function move(hand) {
 */
       }
 
-      if (adjY > 0.4 && flying) {
+      if (adjY > upBorder && flying) {
         stopped = false;
-		Logger.info("Move up", "speed: ", adjYspeed);
+		moveSafely("up", Math.abs(upBorder-adjY));
 		/*
         $(".up").attr({id: 'highlight'})
         $(".down").attr({id: ''})
@@ -58,9 +70,9 @@ function move(hand) {
           })
         }, timeout/2);
 		*/
-      } else if (adjY < 0.4 && flying) {
+      } else if (adjY < downBorder && flying) {
         stopped = false;
-		Logger.info("Move down", "speed: ", adjYspeed);
+		moveSafely("down", Math.abs(downBorder-adjY));
 		/*
         $(".down").attr({id: 'highlight'})
         $(".up").attr({id: ''})
@@ -75,7 +87,7 @@ function move(hand) {
 
       if (adjZ < 0 && flying) {
         stopped = false;
-		Logger.info("Move front", "speed: ", adjZspeed);
+		//Logger.info("Move front", "speed: ", adjZspeed);
 /*
         $(".front").attr({id: 'highlight'})
         $(".back").attr({id: ''})
@@ -87,7 +99,7 @@ function move(hand) {
         }, timeout/3);
 */
       } else if (adjZ > 0 && flying) {
-		Logger.info("Move back", "speed: ", adjYspeed);
+		//Logger.info("Move back", "speed: ", adjYspeed);
 /*
         stopped = false;
         $(".back").attr({id: 'highlight'})
@@ -101,8 +113,8 @@ function move(hand) {
 */
       }
 }
-/*
-Cylon.robot({
+
+var leapRobot = Cylon.robot({
   connection: {
     name: 'leapmotion',
     adaptor: 'leapmotion',
@@ -127,7 +139,7 @@ Cylon.robot({
       //Logger.info(frame.toString());
     });
 
-    my.leapmotion.on('hand', _.throttle(move, 100));
+    my.leapmotion.on('hand', _.throttle(handHandler, 100));
 
     my.leapmotion.on('pointable', function(pointable) {
       //Logger.info(pointable.toString());
@@ -135,7 +147,8 @@ Cylon.robot({
 
     my.leapmotion.on('gesture', function(gesture) {
       //Logger.info(gesture.toString());
-    });  }
-}).start();
+    });  
+  }
+});
 
-*/
+leapRobot.start();
