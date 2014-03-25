@@ -6,11 +6,24 @@ Cylon.robot({
 
   work: function(my) {
     my.drone.takeoff();
-    after((10).seconds(), function() { 
-      my.drone.land();
-    });
-    after((15).seconds(), function() { 
-      my.drone.stop();
-    });    
+	
+	after((8).seconds(), function () {
+		my.drone.hover();
+		my.drone.left(0.8);
+	});
+		
+	after((10).seconds(), function () {
+		my.drone.hover();
+		my.drone.right(0.8);
+	});
+		
+	after((12).seconds(), function() { 
+	  my.drone.hover();
+	  my.drone.land();
+	});
+		
+	after((18).seconds(), function() { 
+	  my.drone.stop();
+	});    
   }
 }).start();

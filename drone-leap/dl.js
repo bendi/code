@@ -1,19 +1,21 @@
 var Cylon = require('cylon'),
 	_ = require("lodash");
 
-var speedAdjuster = 3.5; // higher number decreases action speed.  DO NOT set to less than 1
-
-var flying = true;
+var speedAdjuster = 5.5, // higher number decreases action speed.  DO NOT set to less than 1
+	maxSpeed = .12;
 
 var upBorder = .4,
 	downBorder = .3,
-	upInitialPosition = 10,
-	upMaxSpeed = .15;
+	upInitialPosition = 10;
+	
+var moveSafely;
 
+/*
 function moveSafely(direction, speed) {
 	speed = Math.min(upMaxSpeed, speed);
 	Logger.info("Moving", direction, "at speed", speed.toPrecision(3));
 }
+*/
 	
 function upDownHandler(hand) {
 	speedAdjuster = Math.max(1, speedAdjuster);
@@ -58,47 +60,58 @@ function frontBackHandler(hand) {
       }
 }
 
-var leapRobot = Cylon.robot({
-  connection: {
-    name: 'leapmotion',
-    adaptor: 'leapmotion',
-    port: '127.0.0.1:6437'
-  },
+var flightDuration = 20;
 
-  device: {
-    name: 'leapmotion',
-    driver: 'leapmotion'
-  },
+Cylon.robot({
+	connections: [
+		{name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
+		{name: 'leapmotion', adaptor: 'leapmotion', port: '127.0.0.1:6437'}
+	],
+	devices: [
+		{name: 'drone', driver: 'ardrone'},
+		{name: 'leapmotion', driver: 'leapmotion'}
+	]
 
   work: function(my) {
-	my.leapmotion.on('connect', function() {
-      Logger.info("Connected");
-    });
+    my.drone.takeoff();
 
-    my.leapmotion.on('start', function() {
-      Logger.info("Started");
-    });
+	moveSafely = function () {
+		speed = Math.min(maxSpeed, speed);
+		Logger.info("Moving", direction, "at speed", speed.toPrecision(3));
+		try {
+			my.drone[direction](speed);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+	
+	after((5).seconds(), function () {
+		my.drone.hover();
+	});
 
-    my.leapmotion.on('frame', function(frame) {
-      //Logger.info(frame.toString());
-    });
+	after((8).seconds(), function () {
+		my.leapmotion.on("hand", upDownHandler);
+		my.leapmotion.on("hand", leftRightHandler);
+		my.leapmotion.on("hand", frontBackHandler);
+	});
+	
+	var backToNormalAfter = flightDuration + 8;
 
-    my.leapmotion.on('hand', upDownHandler);
-    my.leapmotion.on('hand', leftRightHandler);
-	my.leapmotion.on('hand', frontBackHandler);
-
-    my.leapmotion.on('pointable', function(pointable) {
-      //Logger.info(pointable.toString());
-    });
-
-    my.leapmotion.on('gesture', function(gesture) {
-      //Logger.info(gesture.toString());
-    });
+	after((backToNormalAfter).seconds(), function () {
+		my.leapmotion.off("hand");
+		my.drone.hover();
+	});
+	
+	after((backToNormalAfter + 1).seconds(), function () {
+		my.drone.land();
+	});
+	
+	after((backToNormalAfter + 7).seconds(), function () {
+		my.drone.stop();
+	});
 	
 	every((0.1).seconds(), function () {
-		//Logger.info(new Date());
-	});
+		my.drone.hover();
+	}
   }
-});
-
-leapRobot.start();
+}).start();
