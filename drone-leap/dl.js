@@ -68,14 +68,14 @@ Cylon.robot({
 		{name: 'leapmotion', adaptor: 'leapmotion', port: '127.0.0.1:6437'}
 	],
 	devices: [
-		{name: 'drone', driver: 'ardrone'},
-		{name: 'leapmotion', driver: 'leapmotion'}
-	]
+		{name: 'drone', driver: 'ardrone', connection: "ardrone"},
+		{name: 'leapmotion', driver: 'leapmotion', connection: "leapmotion"}
+	],
 
   work: function(my) {
     my.drone.takeoff();
 
-	moveSafely = function () {
+	moveSafely = function (direction, speed) {
 		speed = Math.min(maxSpeed, speed);
 		Logger.info("Moving", direction, "at speed", speed.toPrecision(3));
 		try {
@@ -90,15 +90,16 @@ Cylon.robot({
 	});
 
 	after((8).seconds(), function () {
-		my.leapmotion.on("hand", upDownHandler);
+		//my.leapmotion.on("hand", upDownHandler);
 		my.leapmotion.on("hand", leftRightHandler);
-		my.leapmotion.on("hand", frontBackHandler);
+		//my.leapmotion.on("hand", frontBackHandler);
 	});
 	
 	var backToNormalAfter = flightDuration + 8;
 
 	after((backToNormalAfter).seconds(), function () {
-		my.leapmotion.off("hand");
+		Logger.info("Time's up!");
+		my.leapmotion.removeAllListeners("hand");
 		my.drone.hover();
 	});
 	
