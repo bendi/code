@@ -1,7 +1,7 @@
 var Cylon = require('cylon'),
 	_ = require("lodash");
 
-var speedAdjuster = 5.5, // higher number decreases action speed.  DO NOT set to less than 1
+var speedAdjuster = 4.5, // higher number decreases action speed.  DO NOT set to less than 1
 	maxSpeed = .12;
 
 var upBorder = .4,
@@ -111,8 +111,8 @@ Cylon.robot({
 		my.drone.stop();
 	});
 	
-	every((0.1).seconds(), function () {
+	every((2).seconds(), function () {
 		my.drone.hover();
-	}
+	});
   }
 }).start();
