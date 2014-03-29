@@ -108,6 +108,7 @@ Cylon.robot({
 	});
 	
 	after((backToNormalAfter + 7).seconds(), function () {
+		Logger.info("Can be disconnected");
 		my.drone.stop();
 	});
 	
