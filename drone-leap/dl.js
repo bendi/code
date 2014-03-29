@@ -2,11 +2,15 @@ var Cylon = require('cylon'),
 	_ = require("lodash");
 
 var speedAdjuster = 4.5, // higher number decreases action speed.  DO NOT set to less than 1
-	maxSpeed = .12;
+	maxSpeed = .12,
+	flightDuration = 20;
 
 var upBorder = .4,
 	downBorder = .3,
 	upInitialPosition = 10;
+	
+var leftRightBorder = .1;
+var frontBackBorder = .1;
 	
 var moveSafely;
 
@@ -31,8 +35,6 @@ function upDownHandler(hand) {
 
 }
 
-var leftRightBorder = .1;
-
 function leftRightHandler(hand) {
 
 	var xPos = hand.palmX; // position of hand on x axis
@@ -46,8 +48,6 @@ function leftRightHandler(hand) {
     }
 }
 
-var frontBackBorder = .1;
-	
 function frontBackHandler(hand) {
       var zPos = hand.palmZ; // position of hand on z axis
       var adjZ = zPos / 250; // -2 to 2
@@ -60,8 +60,40 @@ function frontBackHandler(hand) {
       }
 }
 
-var flightDuration = 20;
+function createStream(png) {
+	var server = http.createServer(function(req, res) {
+	
+		png.on('error', function (err) {
+			console.error('png stream ERROR: ' + err);
+		});
 
+		res.writeHead(200, { 'Content-Type': 'multipart/x-mixed-replace; boundary=--daboundary' });
+	  
+		function sendPng(buffer) {
+			res.write('--daboundary\nContent-Type: image/png\nContent-length: ' + buffer.length + '\n\n');
+			res.write(buffer);
+		}
+	  
+		png.on('data', sendPng);	  
+	});
+	
+	server.listen(8000);  
+ }
+
+var safetyTimeout;
+
+function clearSafetyTimeout() {
+	if (safetyTimeout) {
+		safetyTimeout = clearTimeout(safetyTimeout);
+	}
+}
+
+function initSafetyTimeout(drone) {
+	safetyTimeout = _.delay(function () {
+		drone.hover();
+	}, 500);
+}
+ 
 Cylon.robot({
 	connections: [
 		{name: 'ardrone', adaptor: 'ardrone', port: '192.168.1.1'},
@@ -73,13 +105,17 @@ Cylon.robot({
 	],
 
   work: function(my) {
+	createPngStream(my.drone.getPngStream());
+	
     my.drone.takeoff();
 
 	moveSafely = function (direction, speed) {
 		speed = Math.min(maxSpeed, speed);
 		Logger.info("Moving", direction, "at speed", speed.toPrecision(3));
 		try {
+			clearSafetyTimeout();
 			my.drone[direction](speed);
+			initSafetyTimeout(my.drone);
 		} catch(e) {
 			console.log(e);
 		}
@@ -110,10 +146,6 @@ Cylon.robot({
 	after((backToNormalAfter + 7).seconds(), function () {
 		Logger.info("Can be disconnected");
 		my.drone.stop();
-	});
-	
-	every((2).seconds(), function () {
-		my.drone.hover();
-	});
+	});	
   }
 }).start();
