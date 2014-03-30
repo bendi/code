@@ -137,23 +137,41 @@ var robot = Cylon.robot({
             leapmotion.on("hand", leftRightHandler);
             //leapmotion.on("hand", frontBackHandler);
         });
+		
+		if (flightDuration <= 0) {
+			leapmotion.on("gesture", function (gesture) {
+				var type = gesture.type;
+				switch (gesture.type) {
+				case "swipe":
+				case "circle":
+					Logger.info("Land!");
+					leapmotion.removeAllListeners("hand");
+					leapmotion.removeAllListeners("gesture");
+					drone.hover();
+					after((1).seconds(), function () {
+						drone.land();
+					});
+					break;
+				}
+			});
+		} else {
+			var backToNormalAfter = flightDuration + 8;
 
-        var backToNormalAfter = flightDuration + 8;
+			after((backToNormalAfter).seconds(), function () {
+				Logger.info("Time's up!");
+				leapmotion.removeAllListeners("hand");
+				drone.hover();
+			});
 
-        after((backToNormalAfter).seconds(), function () {
-            Logger.info("Time's up!");
-            leapmotion.removeAllListeners("hand");
-            drone.hover();
-        });
+			after((backToNormalAfter + 1).seconds(), function () {
+				drone.land();
+			});
 
-        after((backToNormalAfter + 1).seconds(), function () {
-            drone.land();
-        });
-
-        after((backToNormalAfter + 7).seconds(), function () {
-            Logger.info("Can be disconnected");
-            drone.stop();
-        });
+			after((backToNormalAfter + 7).seconds(), function () {
+				Logger.info("Can be disconnected");
+				drone.stop();
+			});
+		}
     }
 });
 
